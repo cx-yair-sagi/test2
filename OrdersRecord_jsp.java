@@ -3,7 +3,7 @@ import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 import org.apache.jasper.runtime.*;
 
-public class EditorialCatGrid_jsp extends HttpJspBase {
+public class OrdersRecord_jsp extends HttpJspBase {
 
 
 //
@@ -408,193 +408,308 @@ public class EditorialCatGrid_jsp extends HttpJspBase {
 
 
 //
-//   Filename: EditorialCatGrid.jsp
+//   Filename: OrdersRecord.jsp
 //   Generated with CodeCharge  v.1.2.0
 //   JSP.ccp build 05/21/2001
 //
 
-static final String sFileName = "EditorialCatGrid.jsp";
+static final String sFileName = "OrdersRecord.jsp";
               
 
 
 
-  void editorial_categories_Show (javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String seditorial_categoriesErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException  {
+
+  String OrdersAction(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String sAction, String sForm, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException {
   
-    String sWhere = "";
-    int iCounter=0;
-    int iPage = 0;
-    boolean bIsScroll = true;
-    boolean hasParam = false;
-    String sOrder = "";
-    String sSQL="";
-    String transitParams = "";
-    String sQueryString = "";
-    String sPage = "";
-    int RecordsPerPage = 20;
-    String sSortParams = "";
-    String formParams = "";
-
-
- 
-    // Build WHERE statement
-        
-    // Build ORDER statement
-    sOrder = " order by e.editorial_cat_name Asc";
-    String sSort = getParam( request, "Formeditorial_categories_Sorting");
-    String sSorted = getParam( request, "Formeditorial_categories_Sorted");
-    String sDirection = "";
-    String sForm_Sorting = "";
-    int iSort = 0;
+    String sOrdersErr ="";
     try {
-      iSort = Integer.parseInt(sSort);
-    }
-    catch (NumberFormatException e ) {
-      sSort = "";
-    }
-    if ( iSort == 0 ) {
-      sForm_Sorting = "";
-    }
-    else {
-      if ( sSort.equals(sSorted)) { 
-        sSorted="0";
-        sForm_Sorting = "";
-        sDirection = " DESC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + sSort + "&";
+
+      if (sAction.equals("")) return "";
+
+      String sSQL="";
+      String transitParams = "";
+      String primaryKeyParams = "";
+      String sQueryString = "";
+      String sPage = "";
+      String sParams = "";
+      String sActionFileName = "OrdersGrid.jsp";
+      String sWhere = " ";
+      boolean bErr = false;
+      long iCount = 0;
+
+  
+      sParams = "?";
+      sParams += "item_id=" + toURL(getParam( request, "Trn_item_id")) + "&";
+      sParams += "member_id=" + toURL(getParam( request, "Trn_member_id"));
+      String pPKorder_id = "";
+      if (sAction.equalsIgnoreCase("cancel") ) {
+        try {
+          if ( stat != null ) stat.close();
+          if ( conn != null ) conn.close();
+        }
+        catch ( java.sql.SQLException ignore ) {}
+        response.sendRedirect (sActionFileName + sParams);
+        return "sendRedirect";
       }
-      else {
-        sSorted=sSort;
-        sForm_Sorting = sSort;
-        sDirection = " ASC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + "&";
+
+      final int iinsertAction = 1;
+      final int iupdateAction = 2;
+      final int ideleteAction = 3;
+      int iAction = 0;
+
+      if ( sAction.equalsIgnoreCase("insert") ) { iAction = iinsertAction; }
+      if ( sAction.equalsIgnoreCase("update") ) { iAction = iupdateAction; }
+      if ( sAction.equalsIgnoreCase("delete") ) { iAction = ideleteAction; }
+
+      // Create WHERE statement
+
+      if ( iAction == iupdateAction || iAction == ideleteAction ) { 
+        pPKorder_id = getParam( request, "PK_order_id");
+        if ( isEmpty(pPKorder_id)) return sOrdersErr;
+        sWhere = "order_id=" + toSQL(pPKorder_id, adNumber);
       }
+
+
+      String fldmember_id="";
+      String flditem_id="";
+      String fldquantity="";
+      String fldorder_id="";
+
+      // Load all form fields into variables
     
-      if ( iSort == 1) { sOrder = " order by e.editorial_cat_name" + sDirection; }
-    }
+      fldmember_id = getParam(request, "member_id");
+      flditem_id = getParam(request, "item_id");
+      fldquantity = getParam(request, "quantity");
+      // Validate fields
+      if ( iAction == iinsertAction || iAction == iupdateAction ) {
+        if ( isEmpty(fldmember_id) ) {
+          sOrdersErr = sOrdersErr + "The value in field Member is required.<br>";
+        }
+        if ( isEmpty(flditem_id) ) {
+          sOrdersErr = sOrdersErr + "The value in field Item is required.<br>";
+        }
+        if ( isEmpty(fldquantity) ) {
+          sOrdersErr = sOrdersErr + "The value in field Quantity is required.<br>";
+        }
+        if ( ! isNumber(fldmember_id)) {
+          sOrdersErr = sOrdersErr + "The value in field Member is incorrect.<br>";
+        }
+        if ( ! isNumber(flditem_id)) {
+          sOrdersErr = sOrdersErr + "The value in field Item is incorrect.<br>";
+        }
+        if ( ! isNumber(fldquantity)) {
+          sOrdersErr = sOrdersErr + "The value in field Quantity is incorrect.<br>";
+        }
+        if (sOrdersErr.length() > 0 ) {
+          return (sOrdersErr);
+        }
+      }
+
+
+      sSQL = "";
+      // Create SQL statement
+
+      switch (iAction) {
   
+        case iinsertAction :
+          
+            sSQL = "insert into orders (" + 
+                "member_id," +
+                "item_id," +
+                "quantity)" +
 
-  // Build full SQL statement
+                " values (" + 
+                toSQL(fldmember_id, adNumber) + "," +
+                toSQL(flditem_id, adNumber) + "," +
+                toSQL(fldquantity, adNumber) + ")";
+          break;
   
-  sSQL = "select e.editorial_cat_id as e_editorial_cat_id, " +
-    "e.editorial_cat_name as e_editorial_cat_name " +
-    " from editorial_categories e ";
-  
-  sSQL = sSQL + sWhere + sOrder;
-
-  String sNoRecords = "     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-width: 1\"><font style=\"font-size: 10pt; color: #000000\">No records</font></td>\n     </tr>";
-
-
-  String tableHeader = "";
-      tableHeader = "     <tr>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"Formeditorial_categories_Sorting=1&Formeditorial_categories_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Name</font></a></td>\n     </tr>";
-  
-  
-  try {
-    out.println("    <table style=\"\">");
-    out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"1\"><a name=\"editorial_categories\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Editorial Category</font></a></td>\n     </tr>");
-    out.println(tableHeader);
-
-  }
-  catch (Exception e) {}
-
-  
-  try {
-    // Select current page
-    iPage = Integer.parseInt(getParam( request, "Formeditorial_categories_Page"));
-  }
-  catch (NumberFormatException e ) {
-    iPage = 0;
-  }
-
-  if (iPage == 0) { iPage = 1; }
-  RecordsPerPage = 20;
-  try {
-    java.sql.ResultSet rs = null;
-    // Open recordset
-    rs = openrs( stat, sSQL);
-    iCounter = 0;
-    absolute (rs, (iPage-1)*RecordsPerPage+1);
-    java.util.Hashtable rsHash = new java.util.Hashtable();
-    String[] aFields = getFieldsName( rs );
-
-    // Show main table based on recordset
-    while ( (iCounter < RecordsPerPage) && rs.next() ) {
-
-      getRecordToHash( rs, rsHash, aFields );
-      String fldeditorial_cat_id = (String) rsHash.get("e_editorial_cat_id");
-      String fldeditorial_cat_name = (String) rsHash.get("e_editorial_cat_name");
-
-      out.println("     <tr>");
+      case iupdateAction:
+        
+          sSQL = "update orders set " +
+                "member_id=" + toSQL(fldmember_id, adNumber) +
+                ",item_id=" + toSQL(flditem_id, adNumber) +
+                ",quantity=" + toSQL(fldquantity, adNumber);
+          sSQL = sSQL + " where " + sWhere;
+        break;
       
-      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<a href=\"EditorialCatRecord.jsp?"+transitParams+"editorial_cat_id="+toURL((String) rsHash.get("e_editorial_cat_id"))+"&\"><font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldeditorial_cat_name)+"</font></a>");
-
-      out.println("</td>");
-      out.println("     </tr>");
-    
-      iCounter++;
-    }
-    if (iCounter == 0) {
-      // Recordset is empty
-      out.println(sNoRecords);
-    
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("<a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      out.println("</td>\n     </tr>");
-    
-      iCounter = RecordsPerPage+1;
-      bIsScroll = false;
-    }
-
-    else {
-
+      case ideleteAction:
+           sSQL = "delete from orders where " + sWhere;
+          
+        break;
   
-    // Parse scroller
-    boolean bInsert = false;
-    boolean bNext = rs.next();
-    if ( !bNext && iPage == 1 ) {
-    
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\">\n       <font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      out.println("\n      </td>\n     </tr>");
-    
-    }
-    else {
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-    
-      out.print("\n       <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      bInsert = true;
-    
-      if ( iPage == 1 ) {
-        out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
       }
-      else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage - 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
+
+      if ( sOrdersErr.length() > 0 ) return sOrdersErr;
+      try {
+        // Execute SQL statement
+        stat.executeUpdate(sSQL);
+      }
+      catch(java.sql.SQLException e) {
+        sOrdersErr = e.toString(); return (sOrdersErr);
       }
   
-      out.print("\n       [ "+iPage+" ]");
-  
-      if (!bNext) { 
-        out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
+      try {
+        if ( stat != null ) stat.close();
+        if ( conn != null ) conn.close();
       }
-      else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage + 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
-      }
-    
-      if ( ! bInsert ) {
-        out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-        out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      }
-    
-      out.println("</td>\n     </tr>");
-    }
-  
-    }
+      catch ( java.sql.SQLException ignore ) {}
+      response.sendRedirect (sActionFileName + sParams);
 
-    if ( rs != null ) rs.close();
-    out.println("    </table>");
-    
+      return "sendRedirect";
+    }
+    catch (Exception e) {out.println(e.toString()); }
+    return (sOrdersErr);
   }
-  catch (Exception e) { out.println(e.toString()); }
-}
 
+  
+
+
+  void Orders_Show(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String sOrdersErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException {
+    try {
+
+      String sSQL="";
+      String sQueryString = "";
+      String sPage = "";
+      String sWhere = "";
+      String transitParams = "";
+      String transitParamsHidden = "";
+      String requiredParams = "";
+      String primaryKeyParams ="";
+      java.util.Hashtable rsHash = new java.util.Hashtable();
+      
+      String porder_id = "";
+
+      String flditem_id="";
+      String fldmember_id="";
+      String fldorder_id="";
+      String fldquantity="";
+
+
+      boolean bPK = true;
+
+      if ( "".equals(sOrdersErr)) {
+        // Load primary key and form parameters
+        flditem_id = getParam( request, "item_id");
+        fldmember_id = getParam( request, "member_id");
+        fldorder_id = getParam( request, "order_id");
+        transitParamsHidden += "<input type=\"hidden\" name=\"Trn_item_id\" value=\""+getParam( request, "item_id")+"\">";
+        transitParams += "Trn_item_id="+getParam( request, "item_id")+"&";
+        transitParamsHidden += "<input type=\"hidden\" name=\"Trn_member_id\" value=\""+getParam( request, "member_id")+"\">";
+        transitParams += "Trn_member_id="+getParam( request, "member_id")+"&";
+        porder_id = getParam( request, "order_id");
+      }
+      else {
+        // Load primary key, form parameters and form fields
+        fldmember_id = getParam( request, "member_id");
+        flditem_id = getParam( request, "item_id");
+        fldquantity = getParam( request, "quantity");
+        transitParamsHidden += "<input type=\"hidden\" name=\"Trn_item_id\" value=\""+getParam( request, "Trn_item_id")+"\">";
+        transitParams += "Trn_item_id="+getParam( request, "Trn_item_id")+"&";
+        
+        transitParamsHidden += "<input type=\"hidden\" name=\"Trn_member_id\" value=\""+getParam( request, "Trn_member_id")+"\">";
+        transitParams += "Trn_member_id="+getParam( request, "Trn_member_id")+"&";
+        
+        porder_id = getParam( request, "PK_order_id");
+      }
+
+      
+      if ( isEmpty(porder_id)) { bPK = false; }
+      
+      sWhere += "order_id=" + toSQL(porder_id, adNumber);
+      primaryKeyParams += "<input type=\"hidden\" name=\"PK_order_id\" value=\""+porder_id+"\"/>";
+
+      sSQL = "select * from orders where " + sWhere;
+
+
+      out.println("    <table style=\"\">");
+      out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"2\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Orders</font></td>\n     </tr>");
+      if ( ! sOrdersErr.equals("")) {
+        out.println("     <tr>\n      <td style=\"background-color: #FFFFFF; border-width: 1\" colspan=\"2\"><font style=\"font-size: 10pt; color: #000000\">"+sOrdersErr+"</font></td>\n     </tr>");
+      }
+      sOrdersErr="";
+      out.println("     <form method=\"get\" action=\""+sFileName+"\" name=\"Orders\">");
+
+      java.sql.ResultSet rs = null;
+
+      if ( bPK &&  ! (sAction.equals("insert") && "Orders".equals(sForm))) {
+
+        // Open recordset
+        rs = openrs( stat, sSQL);
+        rs.next();
+        String[] aFields = getFieldsName( rs );
+        getRecordToHash( rs, rsHash, aFields );
+        rs.close();
+        fldorder_id = (String) rsHash.get("order_id");
+        if ( "".equals(sOrdersErr)) {
+          // Load data from recordset when form displayed first time
+          fldmember_id = (String) rsHash.get("member_id");
+          flditem_id = (String) rsHash.get("item_id");
+          fldquantity = (String) rsHash.get("quantity");
+        }
+
+        if (sAction.equals("") || ! "Orders".equals(sForm)) {
+      
+          fldorder_id = (String) rsHash.get("order_id");
+          fldmember_id = (String) rsHash.get("member_id");
+          flditem_id = (String) rsHash.get("item_id");
+          fldquantity = (String) rsHash.get("quantity");
+        }
+        else {
+          fldorder_id = (String) rsHash.get("order_id");
+        }
+        
+      }
+      else {
+        if ( "".equals(sOrdersErr)) {
+          fldorder_id = toHTML(getParam(request,"order_id"));
+          fldmember_id = toHTML(getParam(request,"member_id"));
+          flditem_id = toHTML(getParam(request,"item_id"));
+        }
+      }
+      
+
+
+      // Show form field
+      
+      out.print("     <tr>\n      <td style=\"background-color: #FFEAC5; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #000000\">Order</font></td><td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldorder_id)+"&nbsp;</font>");
+      out.println("</td>\n     </tr>");
+      
+      out.print("     <tr>\n      <td style=\"background-color: #FFEAC5; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #000000\">Member</font></td><td style=\"background-color: #FFFFFF; border-width: 1\">"); 
+      out.print("<select name=\"member_id\">"+getOptions( conn, "select member_id, member_login from members order by 2",false,true,fldmember_id)+"</select>");
+      
+      out.println("</td>\n     </tr>");
+      
+      out.print("     <tr>\n      <td style=\"background-color: #FFEAC5; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #000000\">Item</font></td><td style=\"background-color: #FFFFFF; border-width: 1\">"); 
+      out.print("<select name=\"item_id\">"+getOptions( conn, "select item_id, name from items order by 2",false,true,flditem_id)+"</select>");
+      
+      out.println("</td>\n     </tr>");
+      
+      out.print("     <tr>\n      <td style=\"background-color: #FFEAC5; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #000000\">Quantity</font></td><td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<input type=\"text\"  name=\"quantity\" maxlength=\"10\" value=\""+toHTML(fldquantity)+"\" size=\"10\">");
+
+      out.println("</td>\n     </tr>");
+      
+      out.print("     <tr>\n      <td colspan=\"2\" align=\"right\">");
+      
+
+      if ( bPK && ! (sAction.equals("insert") && "Orders".equals(sForm))) {
+        out.print("<input type=\"submit\" value=\"Update\" onclick=\"document.Orders.FormAction.value = 'update';\">");out.print("<input type=\"submit\" value=\"Delete\" onclick=\"document.Orders.FormAction.value = 'delete';\">");out.print("<input type=\"submit\" value=\"Cancel\" onclick=\"document.Orders.FormAction.value = 'cancel';\">");
+        out.print("<input type=\"hidden\" name=\"FormName\" value=\"Orders\"><input type=\"hidden\" value=\"update\" name=\"FormAction\">");
+      }
+      
+      else {
+        out.print("<input type=\"submit\" value=\"Insert\" onclick=\"document.Orders.FormAction.value = 'insert';\">");out.print("<input type=\"submit\" value=\"Cancel\" onclick=\"document.Orders.FormAction.value = 'cancel';\">");
+        out.print("<input type=\"hidden\" name=\"FormName\" value=\"Orders\"><input type=\"hidden\" value=\"insert\" name=\"FormAction\">");
+      }
+      out.print(transitParamsHidden+requiredParams+primaryKeyParams);
+      out.println("</td>\n     </tr>\n     </form>\n    </table>");
+      
+
+
+
+    }
+    catch (Exception e) { out.println(e.toString()); }
+  } 
 
   private static java.util.Vector _jspx_includes;
 
@@ -640,7 +755,7 @@ boolean bDebug = false;
 
 String sAction = getParam( request, "FormAction");
 String sForm = getParam( request, "FormName");
-String seditorial_categoriesErr = "";
+String sOrdersErr = "";
 
 java.sql.Connection conn = null;
 java.sql.Statement stat = null;
@@ -653,12 +768,16 @@ if ( ! sErr.equals("") ) {
  }
  catch (Exception e) {}
 }
+if ( sForm.equals("Orders") ) {
+  sOrdersErr = OrdersAction(request, response, session, out, sAction, sForm, conn, stat);
+  if ( "sendRedirect".equals(sOrdersErr)) return;
+}
 
 
       out.write("            \r\n<html>\r\n<head>\r\n<title>Book Store</title>\r\n<meta name=\"GENERATOR\" content=\"YesSoftware CodeCharge v.1.2.0 / JSP.ccp build 05/21/2001\"/>\r\n<meta http-equiv=\"pragma\" content=\"no-cache\"/>\r\n<meta http-equiv=\"expires\" content=\"0\"/>\r\n<meta http-equiv=\"cache-control\" content=\"no-cache\"/>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">\r\n</head>\r\n<body style=\"background-color: #FFFFFF; color: #000000; font-family: Arial, Tahoma, Verdana, Helveticabackground-color: #FFFFFF; color: #000000; font-family: Arial, Tahoma, Verdana, Helvetica\">\r\n");
                                                                         JspRuntimeLibrary.include(request, response, "Header.jsp", out, true);
       out.write("\r\n <table>\r\n  <tr>\r\n   \r\n   <td valign=\"top\">\r\n");
-                   editorial_categories_Show(request, response, session, out, seditorial_categoriesErr, sForm, sAction, conn, stat); 
+                   Orders_Show(request, response, session, out, sOrdersErr, sForm, sAction, conn, stat); 
       out.write("\r\n    \r\n   </td>\r\n  </tr>\r\n </table>\r\n\r\n");
                         JspRuntimeLibrary.include(request, response, "Footer.jsp", out, true);
       out.write("\r\n<center><font face=\"Arial\"><small>This dynamic site was generated with <a href=\"http://www.codecharge.com\">CodeCharge</a></small></font></center>\r\n</body>\r\n</html>\r\n");

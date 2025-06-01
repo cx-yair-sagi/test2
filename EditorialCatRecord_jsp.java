@@ -3,7 +3,7 @@ import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 import org.apache.jasper.runtime.*;
 
-public class EditorialCatGrid_jsp extends HttpJspBase {
+public class EditorialCatRecord_jsp extends HttpJspBase {
 
 
 //
@@ -408,193 +408,240 @@ public class EditorialCatGrid_jsp extends HttpJspBase {
 
 
 //
-//   Filename: EditorialCatGrid.jsp
+//   Filename: EditorialCatRecord.jsp
 //   Generated with CodeCharge  v.1.2.0
 //   JSP.ccp build 05/21/2001
 //
 
-static final String sFileName = "EditorialCatGrid.jsp";
+static final String sFileName = "EditorialCatRecord.jsp";
               
 
 
 
-  void editorial_categories_Show (javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String seditorial_categoriesErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException  {
+
+  String editorial_categoriesAction(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String sAction, String sForm, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException {
   
-    String sWhere = "";
-    int iCounter=0;
-    int iPage = 0;
-    boolean bIsScroll = true;
-    boolean hasParam = false;
-    String sOrder = "";
-    String sSQL="";
-    String transitParams = "";
-    String sQueryString = "";
-    String sPage = "";
-    int RecordsPerPage = 20;
-    String sSortParams = "";
-    String formParams = "";
-
-
- 
-    // Build WHERE statement
-        
-    // Build ORDER statement
-    sOrder = " order by e.editorial_cat_name Asc";
-    String sSort = getParam( request, "Formeditorial_categories_Sorting");
-    String sSorted = getParam( request, "Formeditorial_categories_Sorted");
-    String sDirection = "";
-    String sForm_Sorting = "";
-    int iSort = 0;
+    String seditorial_categoriesErr ="";
     try {
-      iSort = Integer.parseInt(sSort);
-    }
-    catch (NumberFormatException e ) {
-      sSort = "";
-    }
-    if ( iSort == 0 ) {
-      sForm_Sorting = "";
-    }
-    else {
-      if ( sSort.equals(sSorted)) { 
-        sSorted="0";
-        sForm_Sorting = "";
-        sDirection = " DESC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + sSort + "&";
+
+      if (sAction.equals("")) return "";
+
+      String sSQL="";
+      String transitParams = "";
+      String primaryKeyParams = "";
+      String sQueryString = "";
+      String sPage = "";
+      String sParams = "";
+      String sActionFileName = "EditorialCatGrid.jsp";
+      String sWhere = " ";
+      boolean bErr = false;
+      long iCount = 0;
+
+  
+      String pPKeditorial_cat_id = "";
+      if (sAction.equalsIgnoreCase("cancel") ) {
+        try {
+          if ( stat != null ) stat.close();
+          if ( conn != null ) conn.close();
+        }
+        catch ( java.sql.SQLException ignore ) {}
+        response.sendRedirect (sActionFileName);
+        return "sendRedirect";
       }
-      else {
-        sSorted=sSort;
-        sForm_Sorting = sSort;
-        sDirection = " ASC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + "&";
+
+      final int iinsertAction = 1;
+      final int iupdateAction = 2;
+      final int ideleteAction = 3;
+      int iAction = 0;
+
+      if ( sAction.equalsIgnoreCase("insert") ) { iAction = iinsertAction; }
+      if ( sAction.equalsIgnoreCase("update") ) { iAction = iupdateAction; }
+      if ( sAction.equalsIgnoreCase("delete") ) { iAction = ideleteAction; }
+
+      // Create WHERE statement
+
+      if ( iAction == iupdateAction || iAction == ideleteAction ) { 
+        pPKeditorial_cat_id = getParam( request, "PK_editorial_cat_id");
+        if ( isEmpty(pPKeditorial_cat_id)) return seditorial_categoriesErr;
+        sWhere = "editorial_cat_id=" + toSQL(pPKeditorial_cat_id, adNumber);
       }
+
+
+      String fldeditorial_cat_name="";
+      String fldeditorial_cat_id="";
+
+      // Load all form fields into variables
     
-      if ( iSort == 1) { sOrder = " order by e.editorial_cat_name" + sDirection; }
-    }
+      fldeditorial_cat_name = getParam(request, "editorial_cat_name");
+      // Validate fields
+      if ( iAction == iinsertAction || iAction == iupdateAction ) {
+        if (seditorial_categoriesErr.length() > 0 ) {
+          return (seditorial_categoriesErr);
+        }
+      }
+
+
+      sSQL = "";
+      // Create SQL statement
+
+      switch (iAction) {
   
+        case iinsertAction :
+          
+            sSQL = "insert into editorial_categories (" + 
+                "editorial_cat_name)" +
 
-  // Build full SQL statement
+                " values (" + 
+                toSQL(fldeditorial_cat_name, adText) + ")";
+          break;
   
-  sSQL = "select e.editorial_cat_id as e_editorial_cat_id, " +
-    "e.editorial_cat_name as e_editorial_cat_name " +
-    " from editorial_categories e ";
-  
-  sSQL = sSQL + sWhere + sOrder;
-
-  String sNoRecords = "     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-width: 1\"><font style=\"font-size: 10pt; color: #000000\">No records</font></td>\n     </tr>";
-
-
-  String tableHeader = "";
-      tableHeader = "     <tr>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"Formeditorial_categories_Sorting=1&Formeditorial_categories_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Name</font></a></td>\n     </tr>";
-  
-  
-  try {
-    out.println("    <table style=\"\">");
-    out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"1\"><a name=\"editorial_categories\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Editorial Category</font></a></td>\n     </tr>");
-    out.println(tableHeader);
-
-  }
-  catch (Exception e) {}
-
-  
-  try {
-    // Select current page
-    iPage = Integer.parseInt(getParam( request, "Formeditorial_categories_Page"));
-  }
-  catch (NumberFormatException e ) {
-    iPage = 0;
-  }
-
-  if (iPage == 0) { iPage = 1; }
-  RecordsPerPage = 20;
-  try {
-    java.sql.ResultSet rs = null;
-    // Open recordset
-    rs = openrs( stat, sSQL);
-    iCounter = 0;
-    absolute (rs, (iPage-1)*RecordsPerPage+1);
-    java.util.Hashtable rsHash = new java.util.Hashtable();
-    String[] aFields = getFieldsName( rs );
-
-    // Show main table based on recordset
-    while ( (iCounter < RecordsPerPage) && rs.next() ) {
-
-      getRecordToHash( rs, rsHash, aFields );
-      String fldeditorial_cat_id = (String) rsHash.get("e_editorial_cat_id");
-      String fldeditorial_cat_name = (String) rsHash.get("e_editorial_cat_name");
-
-      out.println("     <tr>");
+      case iupdateAction:
+        
+          sSQL = "update editorial_categories set " +
+                "editorial_cat_name=" + toSQL(fldeditorial_cat_name, adText);
+          sSQL = sSQL + " where " + sWhere;
+        break;
       
-      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<a href=\"EditorialCatRecord.jsp?"+transitParams+"editorial_cat_id="+toURL((String) rsHash.get("e_editorial_cat_id"))+"&\"><font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldeditorial_cat_name)+"</font></a>");
-
-      out.println("</td>");
-      out.println("     </tr>");
-    
-      iCounter++;
-    }
-    if (iCounter == 0) {
-      // Recordset is empty
-      out.println(sNoRecords);
-    
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("<a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      out.println("</td>\n     </tr>");
-    
-      iCounter = RecordsPerPage+1;
-      bIsScroll = false;
-    }
-
-    else {
-
+      case ideleteAction:
+           sSQL = "delete from editorial_categories where " + sWhere;
+          
+        break;
   
-    // Parse scroller
-    boolean bInsert = false;
-    boolean bNext = rs.next();
-    if ( !bNext && iPage == 1 ) {
-    
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\">\n       <font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      out.println("\n      </td>\n     </tr>");
-    
-    }
-    else {
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-    
-      out.print("\n       <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      bInsert = true;
-    
-      if ( iPage == 1 ) {
-        out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
       }
-      else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage - 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
+
+      if ( seditorial_categoriesErr.length() > 0 ) return seditorial_categoriesErr;
+      try {
+        // Execute SQL statement
+        stat.executeUpdate(sSQL);
+      }
+      catch(java.sql.SQLException e) {
+        seditorial_categoriesErr = e.toString(); return (seditorial_categoriesErr);
       }
   
-      out.print("\n       [ "+iPage+" ]");
-  
-      if (!bNext) { 
-        out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
+      try {
+        if ( stat != null ) stat.close();
+        if ( conn != null ) conn.close();
       }
-      else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage + 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
-      }
-    
-      if ( ! bInsert ) {
-        out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-        out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      }
-    
-      out.println("</td>\n     </tr>");
-    }
-  
-    }
+      catch ( java.sql.SQLException ignore ) {}
+      response.sendRedirect (sActionFileName);
 
-    if ( rs != null ) rs.close();
-    out.println("    </table>");
-    
+      return "sendRedirect";
+    }
+    catch (Exception e) {out.println(e.toString()); }
+    return (seditorial_categoriesErr);
   }
-  catch (Exception e) { out.println(e.toString()); }
-}
 
+  
+
+
+  void editorial_categories_Show(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String seditorial_categoriesErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException {
+    try {
+
+      String sSQL="";
+      String sQueryString = "";
+      String sPage = "";
+      String sWhere = "";
+      String transitParams = "";
+      String transitParamsHidden = "";
+      String requiredParams = "";
+      String primaryKeyParams ="";
+      java.util.Hashtable rsHash = new java.util.Hashtable();
+      
+      String peditorial_cat_id = "";
+
+      String fldeditorial_cat_id="";
+      String fldeditorial_cat_name="";
+
+
+      boolean bPK = true;
+
+      if ( "".equals(seditorial_categoriesErr)) {
+        // Load primary key and form parameters
+        fldeditorial_cat_id = getParam( request, "editorial_cat_id");
+        peditorial_cat_id = getParam( request, "editorial_cat_id");
+      }
+      else {
+        // Load primary key, form parameters and form fields
+        fldeditorial_cat_id = getParam( request, "editorial_cat_id");
+        fldeditorial_cat_name = getParam( request, "editorial_cat_name");
+        peditorial_cat_id = getParam( request, "PK_editorial_cat_id");
+      }
+
+      
+      if ( isEmpty(peditorial_cat_id)) { bPK = false; }
+      
+      sWhere += "editorial_cat_id=" + toSQL(peditorial_cat_id, adNumber);
+      primaryKeyParams += "<input type=\"hidden\" name=\"PK_editorial_cat_id\" value=\""+peditorial_cat_id+"\"/>";
+
+      sSQL = "select * from editorial_categories where " + sWhere;
+
+
+      out.println("    <table style=\"\">");
+      out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"2\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Editorial Categories</font></td>\n     </tr>");
+      if ( ! seditorial_categoriesErr.equals("")) {
+        out.println("     <tr>\n      <td style=\"background-color: #FFFFFF; border-width: 1\" colspan=\"2\"><font style=\"font-size: 10pt; color: #000000\">"+seditorial_categoriesErr+"</font></td>\n     </tr>");
+      }
+      seditorial_categoriesErr="";
+      out.println("     <form method=\"get\" action=\""+sFileName+"\" name=\"editorial_categories\">");
+
+      java.sql.ResultSet rs = null;
+
+      if ( bPK &&  ! (sAction.equals("insert") && "editorial_categories".equals(sForm))) {
+
+        // Open recordset
+        rs = openrs( stat, sSQL);
+        rs.next();
+        String[] aFields = getFieldsName( rs );
+        getRecordToHash( rs, rsHash, aFields );
+        rs.close();
+        fldeditorial_cat_id = (String) rsHash.get("editorial_cat_id");
+        if ( "".equals(seditorial_categoriesErr)) {
+          // Load data from recordset when form displayed first time
+          fldeditorial_cat_name = (String) rsHash.get("editorial_cat_name");
+        }
+
+        if (sAction.equals("") || ! "editorial_categories".equals(sForm)) {
+      
+          fldeditorial_cat_id = (String) rsHash.get("editorial_cat_id");
+          fldeditorial_cat_name = (String) rsHash.get("editorial_cat_name");
+        }
+        
+      }
+      else {
+        if ( "".equals(seditorial_categoriesErr)) {
+          fldeditorial_cat_id = toHTML(getParam(request,"editorial_cat_id"));
+        }
+      }
+      
+
+
+      // Show form field
+      
+      out.print("     <tr>\n      <td style=\"background-color: #FFEAC5; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #000000\">Name</font></td><td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<input type=\"text\"  name=\"editorial_cat_name\" maxlength=\"50\" value=\""+toHTML(fldeditorial_cat_name)+"\" size=\"50\">");
+
+      out.println("</td>\n     </tr>");
+      
+      out.print("     <tr>\n      <td colspan=\"2\" align=\"right\">");
+      
+
+      if ( bPK && ! (sAction.equals("insert") && "editorial_categories".equals(sForm))) {
+        out.print("<input type=\"submit\" value=\"Update\" onclick=\"document.editorial_categories.FormAction.value = 'update';\">");out.print("<input type=\"submit\" value=\"Delete\" onclick=\"document.editorial_categories.FormAction.value = 'delete';\">");out.print("<input type=\"submit\" value=\"Cancel\" onclick=\"document.editorial_categories.FormAction.value = 'cancel';\">");
+        out.print("<input type=\"hidden\" name=\"FormName\" value=\"editorial_categories\"><input type=\"hidden\" value=\"update\" name=\"FormAction\">");
+      }
+      
+      else {
+        out.print("<input type=\"submit\" value=\"Insert\" onclick=\"document.editorial_categories.FormAction.value = 'insert';\">");out.print("<input type=\"submit\" value=\"Cancel\" onclick=\"document.editorial_categories.FormAction.value = 'cancel';\">");
+        out.print("<input type=\"hidden\" name=\"FormName\" value=\"editorial_categories\"><input type=\"hidden\" value=\"insert\" name=\"FormAction\">");
+      }out.print("<input type=\"hidden\" name=\"editorial_cat_id\" value=\""+toHTML(fldeditorial_cat_id)+"\">");
+      out.print(transitParamsHidden+requiredParams+primaryKeyParams);
+      out.println("</td>\n     </tr>\n     </form>\n    </table>");
+      
+
+
+
+    }
+    catch (Exception e) { out.println(e.toString()); }
+  } 
 
   private static java.util.Vector _jspx_includes;
 
@@ -652,6 +699,10 @@ if ( ! sErr.equals("") ) {
    out.println(sErr);
  }
  catch (Exception e) {}
+}
+if ( sForm.equals("editorial_categories") ) {
+  seditorial_categoriesErr = editorial_categoriesAction(request, response, session, out, sAction, sForm, conn, stat);
+  if ( "sendRedirect".equals(seditorial_categoriesErr)) return;
 }
 
 

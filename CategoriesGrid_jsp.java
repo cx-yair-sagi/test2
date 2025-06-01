@@ -3,7 +3,7 @@ import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 import org.apache.jasper.runtime.*;
 
-public class EditorialCatGrid_jsp extends HttpJspBase {
+public class CategoriesGrid_jsp extends HttpJspBase {
 
 
 //
@@ -408,17 +408,17 @@ public class EditorialCatGrid_jsp extends HttpJspBase {
 
 
 //
-//   Filename: EditorialCatGrid.jsp
+//   Filename: CategoriesGrid.jsp
 //   Generated with CodeCharge  v.1.2.0
 //   JSP.ccp build 05/21/2001
 //
 
-static final String sFileName = "EditorialCatGrid.jsp";
+static final String sFileName = "CategoriesGrid.jsp";
               
 
 
 
-  void editorial_categories_Show (javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String seditorial_categoriesErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException  {
+  void Categories_Show (javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String sCategoriesErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException  {
   
     String sWhere = "";
     int iCounter=0;
@@ -439,9 +439,9 @@ static final String sFileName = "EditorialCatGrid.jsp";
     // Build WHERE statement
         
     // Build ORDER statement
-    sOrder = " order by e.editorial_cat_name Asc";
-    String sSort = getParam( request, "Formeditorial_categories_Sorting");
-    String sSorted = getParam( request, "Formeditorial_categories_Sorted");
+    sOrder = " order by c.name Asc";
+    String sSort = getParam( request, "FormCategories_Sorting");
+    String sSorted = getParam( request, "FormCategories_Sorted");
     String sDirection = "";
     String sForm_Sorting = "";
     int iSort = 0;
@@ -459,24 +459,24 @@ static final String sFileName = "EditorialCatGrid.jsp";
         sSorted="0";
         sForm_Sorting = "";
         sDirection = " DESC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + sSort + "&";
+        sSortParams = "FormCategories_Sorting=" + sSort + "&FormCategories_Sorted=" + sSort + "&";
       }
       else {
         sSorted=sSort;
         sForm_Sorting = sSort;
         sDirection = " ASC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + "&";
+        sSortParams = "FormCategories_Sorting=" + sSort + "&FormCategories_Sorted=" + "&";
       }
     
-      if ( iSort == 1) { sOrder = " order by e.editorial_cat_name" + sDirection; }
+      if ( iSort == 1) { sOrder = " order by c.name" + sDirection; }
     }
   
 
   // Build full SQL statement
   
-  sSQL = "select e.editorial_cat_id as e_editorial_cat_id, " +
-    "e.editorial_cat_name as e_editorial_cat_name " +
-    " from editorial_categories e ";
+  sSQL = "select c.category_id as c_category_id, " +
+    "c.name as c_name " +
+    " from categories c ";
   
   sSQL = sSQL + sWhere + sOrder;
 
@@ -484,12 +484,12 @@ static final String sFileName = "EditorialCatGrid.jsp";
 
 
   String tableHeader = "";
-      tableHeader = "     <tr>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"Formeditorial_categories_Sorting=1&Formeditorial_categories_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Name</font></a></td>\n     </tr>";
+      tableHeader = "     <tr>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"FormCategories_Sorting=1&FormCategories_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Name</font></a></td>\n     </tr>";
   
   
   try {
     out.println("    <table style=\"\">");
-    out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"1\"><a name=\"editorial_categories\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Editorial Category</font></a></td>\n     </tr>");
+    out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"1\"><a name=\"Categories\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Categories</font></a></td>\n     </tr>");
     out.println(tableHeader);
 
   }
@@ -498,7 +498,7 @@ static final String sFileName = "EditorialCatGrid.jsp";
   
   try {
     // Select current page
-    iPage = Integer.parseInt(getParam( request, "Formeditorial_categories_Page"));
+    iPage = Integer.parseInt(getParam( request, "FormCategories_Page"));
   }
   catch (NumberFormatException e ) {
     iPage = 0;
@@ -519,12 +519,11 @@ static final String sFileName = "EditorialCatGrid.jsp";
     while ( (iCounter < RecordsPerPage) && rs.next() ) {
 
       getRecordToHash( rs, rsHash, aFields );
-      String fldeditorial_cat_id = (String) rsHash.get("e_editorial_cat_id");
-      String fldeditorial_cat_name = (String) rsHash.get("e_editorial_cat_name");
+      String fldname = (String) rsHash.get("c_name");
 
       out.println("     <tr>");
       
-      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<a href=\"EditorialCatRecord.jsp?"+transitParams+"editorial_cat_id="+toURL((String) rsHash.get("e_editorial_cat_id"))+"&\"><font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldeditorial_cat_name)+"</font></a>");
+      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<a href=\"CategoriesRecord.jsp?"+transitParams+"category_id="+toURL((String) rsHash.get("c_category_id"))+"&\"><font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldname)+"</font></a>");
 
       out.println("</td>");
       out.println("     </tr>");
@@ -536,7 +535,7 @@ static final String sFileName = "EditorialCatGrid.jsp";
       out.println(sNoRecords);
     
       out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("<a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      out.print("<a href=\"CategoriesRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       out.println("</td>\n     </tr>");
     
       iCounter = RecordsPerPage+1;
@@ -552,21 +551,21 @@ static final String sFileName = "EditorialCatGrid.jsp";
     if ( !bNext && iPage == 1 ) {
     
       out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\">\n       <font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      out.print("\n        <a href=\"CategoriesRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       out.println("\n      </td>\n     </tr>");
     
     }
     else {
       out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
     
-      out.print("\n       <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      out.print("\n       <a href=\"CategoriesRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       bInsert = true;
     
       if ( iPage == 1 ) {
         out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
       }
       else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage - 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
+        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"FormCategories_Page="+(iPage - 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
       }
   
       out.print("\n       [ "+iPage+" ]");
@@ -575,12 +574,12 @@ static final String sFileName = "EditorialCatGrid.jsp";
         out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
       }
       else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage + 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
+        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"FormCategories_Page="+(iPage + 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
       }
     
       if ( ! bInsert ) {
         out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-        out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        out.print("\n        <a href=\"CategoriesRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       }
     
       out.println("</td>\n     </tr>");
@@ -640,7 +639,7 @@ boolean bDebug = false;
 
 String sAction = getParam( request, "FormAction");
 String sForm = getParam( request, "FormName");
-String seditorial_categoriesErr = "";
+String sCategoriesErr = "";
 
 java.sql.Connection conn = null;
 java.sql.Statement stat = null;
@@ -658,7 +657,7 @@ if ( ! sErr.equals("") ) {
       out.write("            \r\n<html>\r\n<head>\r\n<title>Book Store</title>\r\n<meta name=\"GENERATOR\" content=\"YesSoftware CodeCharge v.1.2.0 / JSP.ccp build 05/21/2001\"/>\r\n<meta http-equiv=\"pragma\" content=\"no-cache\"/>\r\n<meta http-equiv=\"expires\" content=\"0\"/>\r\n<meta http-equiv=\"cache-control\" content=\"no-cache\"/>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">\r\n</head>\r\n<body style=\"background-color: #FFFFFF; color: #000000; font-family: Arial, Tahoma, Verdana, Helveticabackground-color: #FFFFFF; color: #000000; font-family: Arial, Tahoma, Verdana, Helvetica\">\r\n");
                                                                         JspRuntimeLibrary.include(request, response, "Header.jsp", out, true);
       out.write("\r\n <table>\r\n  <tr>\r\n   \r\n   <td valign=\"top\">\r\n");
-                   editorial_categories_Show(request, response, session, out, seditorial_categoriesErr, sForm, sAction, conn, stat); 
+                   Categories_Show(request, response, session, out, sCategoriesErr, sForm, sAction, conn, stat); 
       out.write("\r\n    \r\n   </td>\r\n  </tr>\r\n </table>\r\n\r\n");
                         JspRuntimeLibrary.include(request, response, "Footer.jsp", out, true);
       out.write("\r\n<center><font face=\"Arial\"><small>This dynamic site was generated with <a href=\"http://www.codecharge.com\">CodeCharge</a></small></font></center>\r\n</body>\r\n</html>\r\n");

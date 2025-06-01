@@ -3,7 +3,7 @@ import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 import org.apache.jasper.runtime.*;
 
-public class EditorialCatGrid_jsp extends HttpJspBase {
+public class MembersGrid_jsp extends HttpJspBase {
 
 
 //
@@ -408,17 +408,52 @@ public class EditorialCatGrid_jsp extends HttpJspBase {
 
 
 //
-//   Filename: EditorialCatGrid.jsp
+//   Filename: MembersGrid.jsp
 //   Generated with CodeCharge  v.1.2.0
 //   JSP.ccp build 05/21/2001
 //
 
-static final String sFileName = "EditorialCatGrid.jsp";
+static final String sFileName = "MembersGrid.jsp";
               
 
 
 
-  void editorial_categories_Show (javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String seditorial_categoriesErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException  {
+  void Search_Show (javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String sSearchErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException {
+    try {
+      
+
+      String fldname="";
+
+
+      String sSQL="";
+      String transitParams = "";
+      String sQueryString = "";
+      String sPage = "";
+      
+
+      out.println("    <table style=\"\">");
+      
+      out.println("     <form method=\"get\" action=\"MembersGrid.jsp\" name=\"Search\">\n     <tr>");
+      // Set variables with search parameters
+      
+      fldname = getParam( request, "name");
+
+      // Show fields
+      
+
+      out.println("      <td style=\"background-color: #FFEAC5; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #000000\">Name</font></td>");
+      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<input type=\"text\"  name=\"name\" maxlength=\"10\" value=\""+toHTML(fldname)+"\" size=\"10\">");
+ out.println("</td>");
+      
+      out.println("      <td ><input type=\"submit\" value=\"Search\"/></td>");
+      out.println("     </tr>\n     </form>\n    </table>");
+      out.println("");
+    }
+    catch (Exception e) { out.println(e.toString()); }
+  }
+
+
+  void Members_Show (javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpSession session, javax.servlet.jsp.JspWriter out, String sMembersErr, String sForm, String sAction, java.sql.Connection conn, java.sql.Statement stat) throws java.io.IOException  {
   
     String sWhere = "";
     int iCounter=0;
@@ -434,14 +469,25 @@ static final String sFileName = "EditorialCatGrid.jsp";
     String sSortParams = "";
     String formParams = "";
 
+      String pname="";
 
- 
+
+    transitParams = "name=" + toURL(getParam( request, "name")) + "&";
+    formParams = "name=" + toURL(getParam( request, "name")) + "&"; 
     // Build WHERE statement
-        
+    // Check Members parameter and create a valid sql for where clause 
+   
+    pname = getParam( request, "name");
+
+
+    if ( ! pname.equals("") ) { 
+      hasParam = true;
+      sWhere = "m.member_login like '%" + replace(pname, "'", "''") + "%'" + " or " + "m.first_name like '%" + replace(pname, "'", "''") + "%'" + " or " + "m.last_name like '%" + replace(pname, "'", "''") + "%'";}
+    if (hasParam) { sWhere = " WHERE (" + sWhere + ")"; }
     // Build ORDER statement
-    sOrder = " order by e.editorial_cat_name Asc";
-    String sSort = getParam( request, "Formeditorial_categories_Sorting");
-    String sSorted = getParam( request, "Formeditorial_categories_Sorted");
+    sOrder = " order by m.member_login Asc";
+    String sSort = getParam( request, "FormMembers_Sorting");
+    String sSorted = getParam( request, "FormMembers_Sorted");
     String sDirection = "";
     String sForm_Sorting = "";
     int iSort = 0;
@@ -459,37 +505,43 @@ static final String sFileName = "EditorialCatGrid.jsp";
         sSorted="0";
         sForm_Sorting = "";
         sDirection = " DESC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + sSort + "&";
+        sSortParams = "FormMembers_Sorting=" + sSort + "&FormMembers_Sorted=" + sSort + "&";
       }
       else {
         sSorted=sSort;
         sForm_Sorting = sSort;
         sDirection = " ASC";
-        sSortParams = "Formeditorial_categories_Sorting=" + sSort + "&Formeditorial_categories_Sorted=" + "&";
+        sSortParams = "FormMembers_Sorting=" + sSort + "&FormMembers_Sorted=" + "&";
       }
     
-      if ( iSort == 1) { sOrder = " order by e.editorial_cat_name" + sDirection; }
+      if ( iSort == 1) { sOrder = " order by m.member_login" + sDirection; }
+      if ( iSort == 2) { sOrder = " order by m.first_name" + sDirection; }
+      if ( iSort == 3) { sOrder = " order by m.last_name" + sDirection; }
+      if ( iSort == 4) { sOrder = " order by m.member_level" + sDirection; }
     }
   
 
   // Build full SQL statement
   
-  sSQL = "select e.editorial_cat_id as e_editorial_cat_id, " +
-    "e.editorial_cat_name as e_editorial_cat_name " +
-    " from editorial_categories e ";
+  sSQL = "select m.first_name as m_first_name, " +
+    "m.last_name as m_last_name, " +
+    "m.member_id as m_member_id, " +
+    "m.member_level as m_member_level, " +
+    "m.member_login as m_member_login " +
+    " from members m ";
   
   sSQL = sSQL + sWhere + sOrder;
 
-  String sNoRecords = "     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-width: 1\"><font style=\"font-size: 10pt; color: #000000\">No records</font></td>\n     </tr>";
+  String sNoRecords = "     <tr>\n      <td colspan=\"4\" style=\"background-color: #FFFFFF; border-width: 1\"><font style=\"font-size: 10pt; color: #000000\">No records</font></td>\n     </tr>";
 
 
   String tableHeader = "";
-      tableHeader = "     <tr>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"Formeditorial_categories_Sorting=1&Formeditorial_categories_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Name</font></a></td>\n     </tr>";
+      tableHeader = "     <tr>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"FormMembers_Sorting=1&FormMembers_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Login</font></a></td>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"FormMembers_Sorting=2&FormMembers_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">First Name</font></a></td>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"FormMembers_Sorting=3&FormMembers_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Last Name</font></a></td>\n      <td style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><a href=\""+sFileName+"?"+formParams+"FormMembers_Sorting=4&FormMembers_Sorted="+sSorted+"&\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Level</font></a></td>\n     </tr>";
   
   
   try {
     out.println("    <table style=\"\">");
-    out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"1\"><a name=\"editorial_categories\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Editorial Category</font></a></td>\n     </tr>");
+    out.println("     <tr>\n      <td style=\"background-color: #336699; text-align: Center; border-style: outset; border-width: 1\" colspan=\"4\"><a name=\"Members\"><font style=\"font-size: 12pt; color: #FFFFFF; font-weight: bold\">Members</font></a></td>\n     </tr>");
     out.println(tableHeader);
 
   }
@@ -498,7 +550,7 @@ static final String sFileName = "EditorialCatGrid.jsp";
   
   try {
     // Select current page
-    iPage = Integer.parseInt(getParam( request, "Formeditorial_categories_Page"));
+    iPage = Integer.parseInt(getParam( request, "FormMembers_Page"));
   }
   catch (NumberFormatException e ) {
     iPage = 0;
@@ -519,13 +571,22 @@ static final String sFileName = "EditorialCatGrid.jsp";
     while ( (iCounter < RecordsPerPage) && rs.next() ) {
 
       getRecordToHash( rs, rsHash, aFields );
-      String fldeditorial_cat_id = (String) rsHash.get("e_editorial_cat_id");
-      String fldeditorial_cat_name = (String) rsHash.get("e_editorial_cat_name");
+      String fldname = (String) rsHash.get("m_first_name");
+      String fldlast_name = (String) rsHash.get("m_last_name");
+      String fldmember_level = (String) rsHash.get("m_member_level");
+      String fldmember_login = (String) rsHash.get("m_member_login");
 
       out.println("     <tr>");
       
-      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<a href=\"EditorialCatRecord.jsp?"+transitParams+"editorial_cat_id="+toURL((String) rsHash.get("e_editorial_cat_id"))+"&\"><font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldeditorial_cat_name)+"</font></a>");
+      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<a href=\"MembersInfo.jsp?"+transitParams+"member_id="+toURL((String) rsHash.get("m_member_id"))+"&\"><font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldmember_login)+"</font></a>");
 
+      out.println("</td>");
+      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldname)+"&nbsp;</font>");
+      out.println("</td>");
+      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); out.print("<font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldlast_name)+"&nbsp;</font>");
+      out.println("</td>");
+      out.print("      <td style=\"background-color: #FFFFFF; border-width: 1\">"); 
+        fldmember_level = getValFromLOV(fldmember_level, "1;Member;2;Administrator");out.print("<font style=\"font-size: 10pt; color: #000000\">"+toHTML(fldmember_level)+"&nbsp;</font>");
       out.println("</td>");
       out.println("     </tr>");
     
@@ -535,8 +596,8 @@ static final String sFileName = "EditorialCatGrid.jsp";
       // Recordset is empty
       out.println(sNoRecords);
     
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("<a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      out.print("     <tr>\n      <td colspan=\"4\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
+      out.print("<a href=\"MembersRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       out.println("</td>\n     </tr>");
     
       iCounter = RecordsPerPage+1;
@@ -551,22 +612,22 @@ static final String sFileName = "EditorialCatGrid.jsp";
     boolean bNext = rs.next();
     if ( !bNext && iPage == 1 ) {
     
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\">\n       <font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-      out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      out.print("     <tr>\n      <td colspan=\"4\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\">\n       <font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
+      out.print("\n        <a href=\"MembersRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       out.println("\n      </td>\n     </tr>");
     
     }
     else {
-      out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
+      out.print("     <tr>\n      <td colspan=\"4\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
     
-      out.print("\n       <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      out.print("\n       <a href=\"MembersRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       bInsert = true;
     
       if ( iPage == 1 ) {
         out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
       }
       else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage - 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
+        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"FormMembers_Page="+(iPage - 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Previous</font></a>");
       }
   
       out.print("\n       [ "+iPage+" ]");
@@ -575,12 +636,12 @@ static final String sFileName = "EditorialCatGrid.jsp";
         out.print("\n       <a href_=\"#\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
       }
       else {
-        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"Formeditorial_categories_Page="+(iPage + 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
+        out.print("\n       <a href=\""+sFileName+"?"+formParams+sSortParams+"FormMembers_Page="+(iPage + 1)+"#Form\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Next</font></a><br>");
       }
     
       if ( ! bInsert ) {
-        out.print("     <tr>\n      <td colspan=\"1\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
-        out.print("\n        <a href=\"EditorialCatRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        out.print("     <tr>\n      <td colspan=\"4\" style=\"background-color: #FFFFFF; border-style: inset; border-width: 0\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">");
+        out.print("\n        <a href=\"MembersRecord.jsp?"+formParams+"\"><font style=\"font-size: 10pt; color: #CE7E00; font-weight: bold\">Insert</font></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       }
     
       out.println("</td>\n     </tr>");
@@ -640,7 +701,8 @@ boolean bDebug = false;
 
 String sAction = getParam( request, "FormAction");
 String sForm = getParam( request, "FormName");
-String seditorial_categoriesErr = "";
+String sSearchErr = "";
+String sMembersErr = "";
 
 java.sql.Connection conn = null;
 java.sql.Statement stat = null;
@@ -657,8 +719,10 @@ if ( ! sErr.equals("") ) {
 
       out.write("            \r\n<html>\r\n<head>\r\n<title>Book Store</title>\r\n<meta name=\"GENERATOR\" content=\"YesSoftware CodeCharge v.1.2.0 / JSP.ccp build 05/21/2001\"/>\r\n<meta http-equiv=\"pragma\" content=\"no-cache\"/>\r\n<meta http-equiv=\"expires\" content=\"0\"/>\r\n<meta http-equiv=\"cache-control\" content=\"no-cache\"/>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">\r\n</head>\r\n<body style=\"background-color: #FFFFFF; color: #000000; font-family: Arial, Tahoma, Verdana, Helveticabackground-color: #FFFFFF; color: #000000; font-family: Arial, Tahoma, Verdana, Helvetica\">\r\n");
                                                                         JspRuntimeLibrary.include(request, response, "Header.jsp", out, true);
-      out.write("\r\n <table>\r\n  <tr>\r\n   \r\n   <td valign=\"top\">\r\n");
-                   editorial_categories_Show(request, response, session, out, seditorial_categoriesErr, sForm, sAction, conn, stat); 
+      out.write("\r\n <table>\r\n  <tr>\r\n   \r\n   <td valign=\"top\"><font face=arial size=2> Enter full or partial login, first or last name</font>\r\n");
+                               Search_Show(request, response, session, out, sSearchErr, sForm, sAction, conn, stat); 
+      out.write("\r\n    \r\n   </td>\r\n  </tr>\r\n </table>\r\n <table>\r\n  <tr>\r\n   <td valign=\"top\">\r\n");
+                                     Members_Show(request, response, session, out, sMembersErr, sForm, sAction, conn, stat); 
       out.write("\r\n    \r\n   </td>\r\n  </tr>\r\n </table>\r\n\r\n");
                         JspRuntimeLibrary.include(request, response, "Footer.jsp", out, true);
       out.write("\r\n<center><font face=\"Arial\"><small>This dynamic site was generated with <a href=\"http://www.codecharge.com\">CodeCharge</a></small></font></center>\r\n</body>\r\n</html>\r\n");
