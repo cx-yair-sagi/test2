@@ -405,6 +405,26 @@ public class Common_jsp extends HttpJspBase {
     return "";
   }
 
+  String checkSecurity1(int iLevel, javax.servlet.http.HttpSession session, javax.servlet.http.HttpServletResponse response, javax.servlet.http.HttpServletRequest request){
+    try {
+      Object o1 = session.getAttribute("UserID");
+      Object o2 = session.getAttribute("UserRights");
+      boolean bRedirect = false;
+      if ( o1 == null || o2 == null ) { bRedirect = true; }
+      if ( ! bRedirect ) {
+        if ( (o1.toString()).equals("")) { bRedirect = true; }
+        else if ( (new Integer(o2.toString())).intValue() < iLevel) { bRedirect = true; }
+      }
+
+      if ( bRedirect ) {
+        response.sendRedirect("Login.jsp?querystring=" + toURL(request.getQueryString()) + "&ret_page=" + toURL(request.getRequestURI()));
+        return "sendRedirect";
+      }
+    }
+    catch(Exception e){};
+    return "";
+  }
+
 
 
   private static java.util.Vector _jspx_includes;
