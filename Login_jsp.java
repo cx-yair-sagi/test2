@@ -443,8 +443,9 @@ static final String sFileName = "Login.jsp";
           
           if ( rs.next() ) {
             // Login and password passed
+            session.changeSessionId();
             session.setAttribute("UserID", rs.getString(1));
-            
+            session.changeSessionId();
             session.setAttribute("UserRights", rs.getString(2));
             sQueryString = getParam( request, "querystring");
             sPage = getParam( request, "ret_page");
